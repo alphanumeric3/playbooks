@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+  #name: Get current Forgejo version
+  #register: current_version
+  - name: Get latest Forgejo version
+    uri:
+      url: https://codeberg.org/api/v1/repos/forgejo/forgejo/releases/latest
+    register: result
+
+  - name: Print the version
+    debug:
+      msg: "{{ result.json.tag_name }}"
+
