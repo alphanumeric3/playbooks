@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+  - name: Install Caddy
+    package:
+      name: caddy
+      state: present
+
+  - name: Start Caddy service
+    systemd_service:
+      name: caddy.service
+      state: started
+      enabled: true
+      daemon_reload: true
