@@ -2,6 +2,12 @@
 - hosts: all
   become: yes
 
+  handlers:
+  - name: Reload Caddy
+    systemd_service:
+      name: caddy.service
+      state: reloaded
+
   tasks:
   - name: Get current Forgejo version
     shell:
@@ -64,13 +70,23 @@
       owner: git
       group: git
       mode: "0640"
-    tag: config
+    tags: config
   
   - name: Copy systemd unit file
     copy:
       src: ./files/forgejo.service
       dest: /etc/systemd/system/
-    tag: config
+    tags: config
+
+  - name: Copy Caddy config
+    template:
+      src: ./files/Caddyfile.j2
+      dest: /etc/caddy/conf.d/git.{{ base_domain }}.conf
+      owner: caddy
+      group: caddy
+      mode: "0640"
+    notify: Reload Caddy
+    tags: config
 
   - name: Start Forgejo service
     systemd_service:
