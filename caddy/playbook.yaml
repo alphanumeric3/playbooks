@@ -2,11 +2,35 @@
 - hosts: all
   become: yes
 
+  handlers:
+  - name: Reload Caddy
+    systemd_service:
+      name: caddy.service
+      state: reloaded
+
   tasks:
   - name: Install Caddy
     package:
       name: caddy
       state: present
+
+  - name: Create extra config directory
+    file:
+      path: /etc/caddy/conf.d
+      owner: caddy
+      group: caddy
+      mode: "0750"
+      state: directory
+
+  - name: Copy Caddyfile
+    copy:
+      src: ./files/Caddyfile
+      dest: /etc/caddy/Caddyfile
+      owner: caddy
+      group: caddy
+      mode: "0640"
+    tags: config
+    notify: Reload Caddy
 
   - name: Start Caddy service
     systemd_service:
