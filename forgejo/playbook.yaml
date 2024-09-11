@@ -8,6 +8,11 @@
       name: caddy.service
       state: reloaded
 
+  - name: Restart Forgejo
+    systemd_service:
+      name: forgejo.service
+      state: reloaded
+
   tasks:
   - name: Get current Forgejo version
     shell:
@@ -71,6 +76,7 @@
       group: git
       mode: "0640"
     tags: config
+    notify: Restart Forgejo
   
   - name: Copy systemd unit file
     copy:

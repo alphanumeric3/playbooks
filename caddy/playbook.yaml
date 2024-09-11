@@ -21,6 +21,7 @@
       group: caddy
       mode: "0750"
       state: directory
+    tags: config # Just in case it's gone
 
   - name: Copy Caddyfile
     copy:
