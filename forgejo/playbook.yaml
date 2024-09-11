@@ -15,6 +15,7 @@
       url: https://codeberg.org/api/v1/repos/forgejo/forgejo/releases/latest
     register: api_result
 
+  # This is used as an update check
   - name: Store the versions as variables 
     set_fact:
       forgejo_current_version: "{{ cmd_result.stdout }}"
@@ -63,12 +64,14 @@
       owner: git
       group: git
       mode: "0640"
+    tag: config
   
   - name: Copy systemd unit file
     copy:
       src: ./files/forgejo.service
       dest: /etc/systemd/system/
-  
+    tag: config
+
   - name: Start Forgejo service
     systemd_service:
       name: forgejo.service
