@@ -1,0 +1,102 @@
+---
+- hosts: all
+  become: yes
+
+  handlers:
+  - name: Reload Caddy
+    systemd_service:
+      name: caddy.service
+      state: reloaded
+
+  - name: Restart Forgejo
+    systemd_service:
+      name: forgejo.service
+      state: reloaded
+
+  tasks:
+  - name: Get current Forgejo version
+    shell:
+      # TODO: This is ugly but I don't want to check using the API, in case Forgejo is down or not
+      # installed. Should I just make the regex look nicer? Use `cut`? Split in Python?
+      cmd: "forgejo -v | sed -E 's/^Forgejo version ([0-9]\\.[0-9]\\.[0-9]).*/\\1/g'"
+    register: cmd_result
+
+  - name: Get latest Forgejo version
+    uri:
+      url: https://codeberg.org/api/v1/repos/forgejo/forgejo/releases/latest
+    register: api_result
+
+  # This is used as an update check
+  - name: Store the versions as variables 
+    set_fact:
+      forgejo_current_version: "{{ cmd_result.stdout }}"
+      # The Git tag corresponds to the version. It's formatted v0.0.0, so the 'v' is removed.
+      forgejo_new_version: "{{ api_result.json.tag_name[1:] }}"
+
+  - name: Stop Forgejo service
+    service:
+      name: forgejo
+      state: stopped
+
+  - name: Download Forgejo
+    get_url:
+      # TODO: should other CPU architectures be considered?
+      url: "https://codeberg.org/forgejo/forgejo/releases/download/v{{ forgejo_new_version }}/forgejo-{{ forgejo_new_version }}-linux-amd64"
+      dest: /usr/local/bin/forgejo
+      mode: "0755"
+    when: forgejo_current_version != forgejo_new_version
+
+  - name: Create Forgejo group (git)
+    group:
+      name: git
+      system: true
+
+  - name: Create Forgejo user (git)
+    user:
+      name: git
+      system: true
+      home: /home/git
+
+  - name: Create directories
+    file:
+      path: "{{ item }}"
+      owner: git
+      group: git
+      mode: "0750"
+      state: directory
+    loop:
+      - /var/lib/forgejo
+      - /etc/forgejo
+
+  - name: Copy configuration
+    template:
+      src: ./files/app.j2.ini
+      dest: /etc/forgejo/app.ini
+      owner: git
+      group: git
+      mode: "0640"
+    tags: config
+    notify: Restart Forgejo
+  
+  - name: Copy systemd unit file
+    copy:
+      src: ./files/forgejo.service
+      dest: /etc/systemd/system/
+    tags: config
+
+  - name: Copy Caddy config
+    template:
+      src: ./files/Caddyfile.j2
+      dest: /etc/caddy/conf.d/git.{{ base_domain }}.conf
+      owner: caddy
+      group: caddy
+      mode: "0640"
+    notify: Reload Caddy
+    tags: config
+
+  - name: Start Forgejo service
+    systemd_service:
+      name: forgejo.service
+      state: started
+      enabled: true
+      daemon_reload: true
