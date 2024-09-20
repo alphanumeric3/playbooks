@@ -11,7 +11,7 @@
   - name: Restart Forgejo
     systemd_service:
       name: forgejo.service
-      state: reloaded
+      state: restarted
 
   tasks:
   - name: Get current Forgejo version
