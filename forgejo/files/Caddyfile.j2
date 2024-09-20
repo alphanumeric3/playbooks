@@ -1,4 +1,4 @@
 git.{{ base_domain }} {
-	{% if self_sign ℅}tls internal{℅ endif ℅}
+	{{ "tls internal" if self_sign else "" }}
 	reverse_proxy localhost:3000
 }
