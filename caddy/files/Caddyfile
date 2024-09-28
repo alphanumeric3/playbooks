@@ -1,1 +1,11 @@
+{% if self_sign %}
+{
+	pki {
+		ca local {
+			name "{{ base_domain }} Local CA"
+		}
+	}
+}
+{% endif %}
+
 import /etc/caddy/conf.d/*
