@@ -24,7 +24,7 @@
     tags: config # Just in case it's gone
 
   - name: Copy Caddyfile
-    copy:
+    template:
       src: ./files/Caddyfile
       dest: /etc/caddy/Caddyfile
       owner: caddy
@@ -33,7 +33,7 @@
     tags: config
     notify: Reload Caddy
 
-  - name: Start Caddy service
+  - name: Start and enable Caddy service
     systemd_service:
       name: caddy.service
       state: started
