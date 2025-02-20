@@ -34,9 +34,10 @@
       forgejo_new_version: "{{ api_result.json.tag_name[1:] }}"
 
   - name: Stop Forgejo service
-    service:
+    systemd_service:
       name: forgejo
       state: stopped
+    when: ansible_facts.services["forgejo.service"] is defined
 
   - name: Download Forgejo
     get_url:
