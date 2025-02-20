@@ -1,0 +1,5 @@
+base_domain: example.com # base domain for everything
+self_sign: false # should Caddy use an internal CA?
+forgejo:
+  name: "Forgejo"
+  slogan: "Beyond coding. We Forge."

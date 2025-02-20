@@ -4,14 +4,24 @@ Playbooks to help me learn Ansible
 # Usage
 
 ## Is this for me?
-If you want to use this, it's best to make a fork. My templates aren't as flexible as other playbooks,
-so you'll probably need to change things outside the inventory more often.
+This isn't as extensive on config since it's for personal use. You will likely end up adding variables for Jinja templates.
+That said, please feel free to try my playbook out!
 
 ## Inventory
 First, [set up your inventory](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html).
-If you're testing on your own machine, copy `inventory.local.ini` to `inventory.ini`.
+It should at least look like this:
+```yaml
+ungrouped:
+  hosts:
+    server.example.com:
+```
 
-The `base_domain` variable *must* be set. `inventory.local.ini` sets this to test.localhost.
+Where `server.example.com` is the hostname of your server.
+
+For local testing, `inventory.local.yml` is provided to quickly get started.
+
+Then make the `host_vars` directory, and copy `vars.yaml` to `host_vars/NAME_OF_YOUR_HOST.yaml`
+(e.g. `host_vars/server.example.com.yaml` or `host_vars/localhost.yaml`). Be sure to set `base_domain` inside it!
 
 ## Running playbooks
 
@@ -25,6 +35,11 @@ ansible-playbook -Ki inventory service/playbook.yaml
 Where `inventory` is your inventory file and `service` is the thing you want to install.
 
 ### Tags
+Tags select certain tasks and save time during Ansible runs. When running playbooks add `--tags tag1,tag2,...`
+to the command to use them.
 
-You can use the `config` tag to only run configuration related tasks.
-This saves some seconds while running playbooks. I plan on adding more tags!
+Currently only the `config` tag exists, for configuration tasks.
+
+### Playbook documentation
+
+In each playbook directory there may be a README with more information like post-install steps.
