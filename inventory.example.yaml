@@ -1,0 +1,7 @@
+main:
+  hosts:
+    localhost:
+      ansible_connection: local
+      base_domain: cafe.lan
+      self_sign: true
+    frenserv:

@@ -5,23 +5,35 @@ Playbooks to help me learn Ansible
 
 ## Is this for me?
 This isn't as extensive on config since it's for personal use. You will likely end up adding variables for Jinja templates.
-That said, please feel free to try my playbook out!
+That said, please feel free to try my playbooks out!
 
 ## Inventory
-First, [set up your inventory](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html).
-It should at least look like this:
+Copy `inventory.example.yaml` to `inventory.yaml`. It should look like this:
+
 ```yaml
-ungrouped:
+main:
   hosts:
     server.example.com:
 ```
 
 Where `server.example.com` is the hostname of your server.
 
-For local testing, `inventory.local.yml` is provided to quickly get started.
+For local testing, `inventory.local.yml` is also provided for use.
 
-Then make the `host_vars` directory, and copy `vars.yaml` to `host_vars/NAME_OF_YOUR_HOST.yaml`
-(e.g. `host_vars/server.example.com.yaml` or `host_vars/localhost.yaml`). Be sure to set `base_domain` inside it!
+Then copy `vars.example.yaml` to `group_vars/main.yaml` and modify as needed.
+
+Alternatively, variables can be kept in the inventory, and even set per-host:
+
+```yaml
+main:
+  hosts:
+    server.example.com:
+      this_is_a_host_var: true
+  vars:
+    this_is_a_group_var: true
+```
+
+Full information on inventories is in the [Ansible documentation](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html).
 
 ## Running playbooks
 
