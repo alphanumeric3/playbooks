@@ -1,0 +1,46 @@
+---
+- hosts: web
+  become: yes
+
+  handlers:
+  - name: Reload Caddy
+    service:
+      name: caddy
+      state: reloaded
+
+  - name: Restart Forgejo
+    service:
+      name: forgejo
+      state: restarted
+
+  tasks:
+  - name: Install Forgejo
+    package:
+      name: forgejo
+      state: latest
+
+  - name: Copy configuration
+    template:
+      src: ./files/app.j2.ini
+      dest: /etc/forgejo/app.ini
+      owner: forgejo
+      group: forgejo
+      mode: "0640"
+    tags: config
+    notify: Restart Forgejo
+
+  - name: Copy Caddy config
+    template:
+      src: ./files/Caddyfile.j2
+      dest: /etc/caddy/conf.d/git.{{ base_domain }}.conf
+      owner: caddy
+      group: caddy
+      mode: "0640"
+    notify: Reload Caddy
+    tags: config
+
+  - name: Start and enable Forgejo service
+    service:
+      name: forgejo
+      state: started
+      enabled: true

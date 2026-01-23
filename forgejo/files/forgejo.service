@@ -1,0 +1,18 @@
+[Unit]
+Description=Forgejo (Beyond coding. We forge.)
+After=network.target
+
+[Service]
+# Uncomment the next line if you have repos with lots of files and get a HTTP 500 error because of that
+# LimitNOFILE=524288:524288
+RestartSec=2s
+Type=simple
+User=git
+Group=git
+WorkingDirectory=/var/lib/forgejo/
+ExecStart=/usr/local/bin/forgejo web --config /etc/forgejo/app.ini
+Restart=always
+Environment=USER=git HOME=/home/git FORGEJO_WORK_DIR=/var/lib/forgejo
+
+[Install]
+WantedBy=multi-user.target
