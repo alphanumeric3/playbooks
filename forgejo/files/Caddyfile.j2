@@ -1,4 +1,8 @@
-git.{{ base_domain }} {
-	{{ "tls internal" if self_sign else "" }}
-	reverse_proxy localhost:3000
+{{ forgejo.domain }} {
+	{{ "tls internal" if caddy.self_sign else "" }}
+	reverse_proxy {
+	{% for host in groups["forgejo"] %}
+		to {{ hostvars[host]["ansible_facts"]["default_ipv4"]["address"] }}:3000 # {{ host }}
+	{% endfor %}
+	}
 }

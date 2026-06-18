@@ -1,4 +1,4 @@
-{% if self_sign %}
+{% if caddy.self_sign %}
 {
 	pki {
 		ca local {

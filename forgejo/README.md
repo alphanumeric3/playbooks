@@ -1,6 +1,8 @@
 # Forgejo
 
-No extra variables at the moment.
+Variables:
+- `name`: Name of the instance
+- `slogan`: Slogan shown on homepage, page titles, etc
 
 # Creating an initial user
 

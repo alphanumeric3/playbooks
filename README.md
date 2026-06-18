@@ -9,19 +9,30 @@ That said, please feel free to try my playbook out!
 
 ## Inventory
 First, [set up your inventory](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html).
-It should at least look like this:
+
 ```yaml
-ungrouped:
+all:
+  vars:
+    base_domain: example.com # Base domain for everything
+
+# Group for every host running Caddy
+caddy:
   hosts:
-    server.example.com:
+    caddy_host:
+  vars:
+    caddy:
+      self_sign: false # Should Caddy use an internal CA?
+
+# Group for every host running Forgejo
+forgejo:
+  hosts:
+    forgejo_host:
+  vars:
+    forgejo:
+      name: "Forgejo"
+      slogan: "Internal test forge"
+      domain: "git.{{ base_domain }}"
 ```
-
-Where `server.example.com` is the hostname of your server.
-
-For local testing, `inventory.local.yml` is provided to quickly get started.
-
-Then make the `host_vars` directory, and copy `vars.yaml` to `host_vars/NAME_OF_YOUR_HOST.yaml`
-(e.g. `host_vars/server.example.com.yaml` or `host_vars/localhost.yaml`). Be sure to set `base_domain` inside it!
 
 ## Running playbooks
 

@@ -1,5 +1,5 @@
 ---
-- hosts: web
+- hosts: forgejo
   become: yes
 
   handlers:
@@ -7,6 +7,8 @@
     service:
       name: caddy
       state: reloaded
+    delegate_to: "{{ item }}"
+    loop: "{{ groups['caddy'] }}"
 
   - name: Restart Forgejo
     service:
@@ -24,7 +26,7 @@
       src: ./files/app.j2.ini
       dest: /etc/forgejo/app.ini
       owner: forgejo
-      group: forgejo
+      group: www-data # Alpine packaging choice
       mode: "0640"
     tags: config
     notify: Restart Forgejo
@@ -32,11 +34,13 @@
   - name: Copy Caddy config
     template:
       src: ./files/Caddyfile.j2
-      dest: /etc/caddy/conf.d/git.{{ base_domain }}.conf
+      dest: /etc/caddy/conf.d/{{ forgejo.domain }}.conf
       owner: caddy
       group: caddy
       mode: "0640"
     notify: Reload Caddy
+    delegate_to: "{{ item }}"
+    loop: "{{ groups['caddy'] }}"
     tags: config
 
   - name: Start and enable Forgejo service
